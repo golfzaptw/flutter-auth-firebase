@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'auth.dart';
+import '../service/auth.dart';
 
 class LoginPage extends StatefulWidget {
   final String title;
@@ -136,11 +136,15 @@ class _LoginPageState extends State<LoginPage> {
           decoration: InputDecoration(labelText: 'Password'),
           keyboardType: TextInputType.number,
           validator: validatePassword,
+          obscureText: true,
+          autofocus: false,
         ),
         TextFormField(
           decoration: InputDecoration(labelText: 'Re Password'),
           keyboardType: TextInputType.number,
           validator: validateRePassword,
+          obscureText: true,
+          autofocus: false,
         ),
       ];
     }
@@ -181,10 +185,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   String validateEmail(String value) {
+    _email = value;
     Pattern pattern =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
     RegExp regex = new RegExp(pattern);
-    if (!regex.hasMatch(value))
+    if (!regex.hasMatch(_email))
       return 'Enter Valid Email';
     else
       return null;
@@ -196,8 +201,8 @@ class _LoginPageState extends State<LoginPage> {
     RegExp regExp = RegExp(pattern);
     if (_password.length == 0) {
       return "Password is required";
-    } else if (_password.length > 10) {
-      return "Password is less than 10 character";
+    } else if (_password.length < 6 || _password.length > 20) {
+      return "Password should more than 6 and less than 20 character";
     } else if (!regExp.hasMatch(_password)) {
       return "Password is number only!";
     } else {

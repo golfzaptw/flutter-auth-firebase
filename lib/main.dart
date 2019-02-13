@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'root_page.dart';
-import 'auth.dart';
+import 'views/root_page.dart';
+import 'service/auth.dart';
 
 void main() => runApp(MyApp(title: 'App firebase login demo'));
 
