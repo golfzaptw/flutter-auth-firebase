@@ -19,7 +19,7 @@ enum formType { login, register }
 class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
 
-  String _email, _password;
+  String _email, _password, _repassword;
   formType _formtype = formType.login;
 
   bool validateAndSave() {
@@ -38,16 +38,44 @@ class _LoginPageState extends State<LoginPage> {
           String userId =
               await widget.auth.signInWithEmailAndPassword(_email, _password);
           print('Sign in: $userId');
+          widget.onSignedIn();
         } else {
-          String userId = await widget.auth
-              .createUserWithEmailAndPassword(_email, _password);
-          print('Register : $userId');
+          if (_password == _repassword) {
+            String userId = await widget.auth
+                .createUserWithEmailAndPassword(_email, _password);
+            print('Register : $userId');
+            widget.onSignedIn();
+          } else {
+            print('password not match');
+          }
         }
-        widget.onSignedIn();
       } catch (e) {
-        print('Error: $e');
+        _showDialog();
       }
     }
+  }
+
+  void _showDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Login Fail"),
+          content: new Text("Email or password are not match."),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void moveToRegister() {
@@ -83,19 +111,39 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   List<Widget> _buildInput() {
-    return [
-      TextFormField(
-        decoration: InputDecoration(labelText: 'Email'),
-        validator: (value) => value.isEmpty ? 'Email can\'t empty' : null,
-        onSaved: (value) => _email = value,
-      ),
-      TextFormField(
-        decoration: InputDecoration(labelText: 'Password'),
-        obscureText: true,
-        validator: (value) => value.isEmpty ? 'Password can\'t empty' : null,
-        onSaved: (value) => _password = value,
-      ),
-    ];
+    if (_formtype == formType.login) {
+      return [
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Email'),
+          validator: validateEmail,
+          onSaved: (value) => _email = value,
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Password'),
+          obscureText: true,
+          validator: validatePassword,
+          onSaved: (value) => _password = value,
+        ),
+      ];
+    } else {
+      return [
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Email'),
+          keyboardType: TextInputType.emailAddress,
+          validator: validateEmail,
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Password'),
+          keyboardType: TextInputType.number,
+          validator: validatePassword,
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Re Password'),
+          keyboardType: TextInputType.number,
+          validator: validateRePassword,
+        ),
+      ];
+    }
   }
 
   List<Widget> _buildSubmitButton() {
@@ -129,6 +177,48 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: moveToLogin,
         )
       ];
+    }
+  }
+
+  String validateEmail(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    if (!regex.hasMatch(value))
+      return 'Enter Valid Email';
+    else
+      return null;
+  }
+
+  String validatePassword(String value) {
+    _password = value;
+    String pattern = r'(^[0-9]*$)';
+    RegExp regExp = RegExp(pattern);
+    if (_password.length == 0) {
+      return "Password is required";
+    } else if (_password.length > 10) {
+      return "Password is less than 10 character";
+    } else if (!regExp.hasMatch(_password)) {
+      return "Password is number only!";
+    } else {
+      return null;
+    }
+  }
+
+  String validateRePassword(String value) {
+    _repassword = value;
+    String pattern = r'(^[0-9]*$)';
+    RegExp regExp = RegExp(pattern);
+    if (_repassword.length == 0) {
+      return "Password is required";
+    } else if (_repassword.length > 10) {
+      return "Password is less than 10 character";
+    } else if (!regExp.hasMatch(_password)) {
+      return "Password is number only!";
+    } else if (_repassword != _password) {
+      return "Password and Re-Password are not match";
+    } else {
+      return null;
     }
   }
 }

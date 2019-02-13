@@ -8,7 +8,6 @@ class HomePage extends StatefulWidget {
   const HomePage({Key key, this.auth, this.onSignedOut}) : super(key: key);
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _HomePageState();
   }
 }
