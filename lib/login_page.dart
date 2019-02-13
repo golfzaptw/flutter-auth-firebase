@@ -3,10 +3,11 @@ import 'auth.dart';
 
 class LoginPage extends StatefulWidget {
   final String title;
-
   final BaseAuth auth;
+  final VoidCallback onSignedIn;
 
-  const LoginPage({Key key, this.title, this.auth}) : super(key: key);
+  const LoginPage({Key key, this.title, this.auth, this.onSignedIn})
+      : super(key: key);
   @override
   State<StatefulWidget> createState() {
     return _LoginPageState();
@@ -42,6 +43,7 @@ class _LoginPageState extends State<LoginPage> {
               .createUserWithEmailAndPassword(_email, _password);
           print('Register : $userId');
         }
+        widget.onSignedIn();
       } catch (e) {
         print('Error: $e');
       }

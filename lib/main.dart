@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart';
+import 'root_page.dart';
 import 'auth.dart';
 
 void main() => runApp(MyApp(title: 'App firebase login demo'));
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: (''),
       theme: ThemeData(primaryColor: Colors.black),
-      home: LoginPage(
+      home: RootPage(
         title: title,
         auth: Auth(),
       ),
