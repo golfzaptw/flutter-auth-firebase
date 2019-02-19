@@ -134,14 +134,14 @@ class _LoginPageState extends State<LoginPage> {
         ),
         TextFormField(
           decoration: InputDecoration(labelText: 'Password'),
-          keyboardType: TextInputType.number,
+          // keyboardType: TextInputType.number,
           validator: validatePassword,
           obscureText: true,
           autofocus: false,
         ),
         TextFormField(
           decoration: InputDecoration(labelText: 'Re Password'),
-          keyboardType: TextInputType.number,
+          // keyboardType: TextInputType.number,
           validator: validateRePassword,
           obscureText: true,
           autofocus: false,
@@ -184,21 +184,24 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Pattern patternEmail =
+      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+  Pattern patternPassword = r'(^[0-9]*$)';
+
   String validateEmail(String value) {
     _email = value;
-    Pattern pattern =
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-    RegExp regex = new RegExp(pattern);
-    if (!regex.hasMatch(_email))
+    RegExp regex = new RegExp(patternEmail);
+    if (_email.isEmpty) {
+      return 'Email is required';
+    } else if (!regex.hasMatch(_email)) {
       return 'Enter Valid Email';
-    else
+    } else
       return null;
   }
 
   String validatePassword(String value) {
     _password = value;
-    String pattern = r'(^[0-9]*$)';
-    RegExp regExp = RegExp(pattern);
+    RegExp regExp = RegExp(patternPassword);
     if (_password.length == 0) {
       return "Password is required";
     } else if (_password.length < 6 || _password.length > 20) {
@@ -212,8 +215,7 @@ class _LoginPageState extends State<LoginPage> {
 
   String validateRePassword(String value) {
     _repassword = value;
-    String pattern = r'(^[0-9]*$)';
-    RegExp regExp = RegExp(pattern);
+    RegExp regExp = RegExp(patternPassword);
     if (_repassword.length == 0) {
       return "Password is required";
     } else if (_repassword.length > 10) {
