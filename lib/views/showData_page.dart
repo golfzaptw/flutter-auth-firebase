@@ -1,8 +1,15 @@
+// import package
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase/model/data.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+// import file
+import '../service/auth.dart';
 
 class ShowDataPage extends StatefulWidget {
+  final BaseAuth auth;
+
+  const ShowDataPage({Key key, this.auth}) : super(key: key);
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -12,11 +19,12 @@ class ShowDataPage extends StatefulWidget {
 
 class _ShowDataPageState extends State<ShowDataPage> {
   List<Data> allData = [];
+  String userId = 'dwc3c5rgYVVYvdhtacnMUyscvIp2';
 
   @override
   void initState() {
     DatabaseReference ref = FirebaseDatabase.instance.reference();
-    ref.child('uid').once().then((DataSnapshot snapshot) {
+    ref.child(userId).once().then((DataSnapshot snapshot) {
       var keys = snapshot.value.keys;
       var data = snapshot.value;
       allData.clear();
@@ -67,7 +75,10 @@ class _ShowDataPageState extends State<ShowDataPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text('Title: $title',style: Theme.of(context).textTheme.title,),
+            Text(
+              'Title: $title',
+              style: Theme.of(context).textTheme.title,
+            ),
             Text('Gender: $gender'),
             Text('Message: $message')
           ],
