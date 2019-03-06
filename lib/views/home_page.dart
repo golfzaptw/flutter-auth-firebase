@@ -1,14 +1,19 @@
+// import package
 import 'package:flutter/material.dart';
-import '../service/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+// import file
+import '../service/auth.dart';
 import 'showData_page.dart';
+import 'socket/socket_page.dart';
+import 'chat/chat_screen.dart';
 
 class HomePage extends StatefulWidget {
   final BaseAuth auth;
   final VoidCallback onSignedOut;
 
-  const HomePage({Key key, this.auth, this.onSignedOut}) : super(key: key);
+  const HomePage({Key key, @required this.auth, this.onSignedOut})
+      : super(key: key);
   @override
   State<StatefulWidget> createState() {
     return _HomePageState();
@@ -19,7 +24,8 @@ class _HomePageState extends State<HomePage> {
   String title;
   String message;
   String gender;
-  
+  String userid;
+
   bool _autoValidate = false;
   List<DropdownMenuItem<String>> items = [
     DropdownMenuItem(
@@ -92,6 +98,7 @@ class _HomePageState extends State<HomePage> {
                   maxLength: 50,
                   validator: validateTitle,
                   onSaved: (val) {
+                    userid = uid;
                     title = val;
                   },
                 ),
@@ -136,9 +143,44 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ShowDataPage()));
+                            builder: (context) =>
+                                ShowDataPage(auth: widget.auth)));
                   },
                   child: Text('Show data'),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                RaisedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                SocketPage(title: 'Socket Page')));
+                  },
+                  child: Text('Socket Page'),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                RaisedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                ChatScreen(title: 'Chat Screen')));
+                  },
+                  child: Text('Chat Screen'),
                 ),
               ],
             ),
@@ -150,16 +192,38 @@ class _HomePageState extends State<HomePage> {
 
   _sendToServer() {
     if (_key.currentState.validate()) {
-      _key.currentState.save();
-      DatabaseReference ref = FirebaseDatabase.instance.reference();
-      var data = {
-        "title": title,
-        "gender": gender,
-        "message": message,
-      };
-      ref.child('uid').push().set(data).then((v) {
-        _key.currentState.reset();
-      });
+      if (gender == 'Male' || gender == 'Female') {
+        _key.currentState.save();
+        DatabaseReference ref = FirebaseDatabase.instance.reference();
+        var data = {
+          "title": title,
+          "gender": gender,
+          "message": message,
+        };
+        ref.child(userid).push().set(data).then((v) {
+          _key.currentState.reset();
+        });
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            // return object of type Dialog
+            return AlertDialog(
+              title: new Text("Please select gender"),
+              content: new Text("Gender is Male or Female only."),
+              actions: <Widget>[
+                // usually buttons at the bottom of the dialog
+                new FlatButton(
+                  child: new Text("Close"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
     } else {
       _autoValidate = true;
     }
